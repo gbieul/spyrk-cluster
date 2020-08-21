@@ -1,0 +1,65 @@
+version: "3.7"
+services:
+  spark-master:
+    image: gbieul/spark-master:2.4
+    container_name: spark-master
+    hostname: spark-master
+    volumes:
+      - ./user_data:/user_data
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    networks: 
+      spark-network:
+        ipv4_address: 10.5.0.2
+    environment:
+      - "SPARK_LOCAL_IP=spark-master"
+  spark-worker-1:
+    image: gbieul/spark-worker:2.4
+    container_name: spark-worker-1
+    hostname: spark-worker-1
+    depends_on:
+      - spark-master
+    ports:
+      - "8081:8081"
+    env_file: ./env/spark-worker.sh
+    environment:
+      - "SPARK_LOCAL_IP=spark-worker-1"
+    networks: 
+      spark-network:
+        ipv4_address: 10.5.0.3
+  spark-worker-2:
+    image: gbieul/spark-worker:2.4
+    container_name: spark-worker-2
+    hostname: spark-worker-2
+    depends_on:
+      - spark-master
+    ports:
+      - "8082:8081"
+    env_file: ./env/spark-worker.sh
+    environment:
+      - "SPARK_LOCAL_IP=spark-worker-2"
+    networks: 
+      spark-network:
+        ipv4_address: 10.5.0.4
+  spark-worker-3:
+    image: gbieul/spark-worker:2.4
+    container_name: spark-worker-3
+    hostname: spark-worker-3
+    depends_on:
+      - spark-master
+    ports:
+      - "8083:8081"
+    env_file: ./env/spark-worker.sh
+    environment:
+      - "SPARK_LOCAL_IP=spark-worker-3"
+    networks: 
+      spark-network:
+        ipv4_address: 10.5.0.5
+networks:
+  spark-network:
+    driver: bridge
+    ipam:
+     driver: default
+     config:
+       - subnet: 10.5.0.0/16
