@@ -57,9 +57,9 @@ RUN chmod 600 /root/.ssh/config
 
 COPY config/spark ${SPARK_HOME}/conf/
 
-COPY config/hadoop/*.xml /usr/hadoop/etc/hadoop/
-COPY config/hadoop/*.sh /usr/hadoop/etc/hadoop/
-COPY config/workers /usr/hadoop/etc/hadoop
+COPY config/hadoop/*.xml /usr/hadoop-$HADOOP_VERSION/etc/hadoop/
+COPY config/hadoop/*.sh /usr/hadoop-$HADOOP_VERSION/etc/hadoop/
+COPY config/workers /usr/hadoop-$HADOOP_VERSION/etc/hadoop
 COPY config/scripts /
 RUN echo "export JAVA_HOME=${JAVA_HOME}" >> /etc/environment
 
