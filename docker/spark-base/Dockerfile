@@ -63,6 +63,6 @@ COPY config/workers /usr/hadoop-$HADOOP_VERSION/etc/hadoop
 COPY config/scripts /
 RUN echo "export JAVA_HOME=${JAVA_HOME}" >> /etc/environment
 
-EXPOSE 9000 4040 8020 22
+EXPOSE 9000 4040 8020 22 9999
 
 ENTRYPOINT ["/bin/bash", "bootstrap.sh"]

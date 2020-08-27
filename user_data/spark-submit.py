@@ -13,13 +13,17 @@ from pyspark.sql.functions import *
 # Inicializando Spark
 findspark.init()
 
-sc = SparkContext("local", "nasa_data")
+conf = (SparkConf()
+            .setAppName("NasaData"))
+
+sc = SparkContext(conf = conf)
 sqlContext = SQLContext(sc)
 spark = SparkSession(sc)
 
 def main():
 
-    df = spark.read.text('code')
+    #df = spark.read.text('code')
+    df = spark.read.text('hdfs://user_data/')
 
     # Montando dataframe
     host = r'(^\S+\.[\S+\.]+\S+)\s'
@@ -47,7 +51,7 @@ def main():
     logs_df = logs_df.withColumn('timestamp', unix_timestamp('timestamp', format).cast('timestamp'))
 
     # Salvando csv. Repartition com valor 1 apenas por termos poucos dados
-    logs_df.repartition(1).write.csv(path='/code/1_1_host_count', mode="append", header="true")
+    logs_df.repartition(3).write.csv(path='hdfs:///user_data/processado.csv', mode="append", header="true")
 
  
 if __name__ == "__main__":

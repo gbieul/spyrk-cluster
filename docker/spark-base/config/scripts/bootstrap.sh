@@ -6,13 +6,14 @@ if [[ $HOSTNAME = spark-master ]]; then
     
     $HADOOP_HOME/sbin/start-dfs.sh
     $HADOOP_HOME/sbin/start-yarn.sh
+    hdfs dfs -mkdir /user_data
+    hdfs dfs -put /code/*.txt /user_data
     #start-master.sh
 
 else
     # useradd hadoop
-    /usr/hadoop-2.7.3/bin/hadoop-daemon.sh start datanode
-    /usr/hadoop-2.7.3/bin/yarn nodemanager
-
+    $HADOOP_HOME/sbin/hadoop-daemon.sh start datanode
+    $HADOOP_HOME/bin/yarn nodemanager
 fi
 #bash
 while :; do :; done & kill -STOP $! && wait $!

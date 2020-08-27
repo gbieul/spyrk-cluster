@@ -27,11 +27,11 @@
   </property>
   <property>
       <name>mapreduce.map.memory.mb</name>
-      <value>256</value>
+      <value>128</value>
   </property>
   <property>
       <name>mapreduce.reduce.memory.mb</name>
-      <value>256</value>
+      <value>128</value>
   </property>
   <property>
       <name>mapreduce.map.java.opts</name>
