@@ -75,8 +75,8 @@ _TO DO_
 
 ## 1.4. Como usar
 
-Basicamente, faça um `git clone` deste repositório primeiramente. Então, faça `chmod +x *.sh` para per-
-mitir que os arquivos shell sejam executados.
+Basicamente, faça um `git clone` deste repositório primeiramente. Então, faça `chmod +x *.sh` para 
+permitir que os arquivos shell sejam executados.
 
 Execute `./build-images.sh`. Sua instalação docker deverá construir as imagens base, master e worker. Ao
 fim do processo, rode docker-compose up para subir a stack.
