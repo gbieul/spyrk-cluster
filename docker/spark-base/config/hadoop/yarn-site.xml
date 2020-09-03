@@ -22,7 +22,7 @@
         </property>
         <property>
                 <name>yarn.scheduler.minimum-allocation-mb</name>
-                <value>256</value>
+                <value>128</value>
         </property>
         <property>
                 <name>yarn.scheduler.maximum-allocation-mb</name>
@@ -31,5 +31,9 @@
         <property>
                 <name>yarn.nodemanager.vmem-check-enabled</name>
                 <value>false</value>
+        </property>
+        <property>
+                <name>yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage</name>
+                <value>99.0</value>
         </property>
 </configuration>

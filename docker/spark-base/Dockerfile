@@ -1,4 +1,4 @@
-FROM openjdk:16-jdk-slim
+FROM openjdk:8-jdk-slim
 
 ENV HADOOP_VERSION 2.7.3
 ENV HADOOP_HOME /usr/hadoop-$HADOOP_VERSION
@@ -10,21 +10,28 @@ ENV SPARK_HOME /usr/spark-${SPARK_VERSION}
 ENV SPARK_DIST_CLASSPATH="$HADOOP_HOME/etc/hadoop/*:$HADOOP_HOME/share/hadoop/common/lib/*:$HADOOP_HOME/share/hadoop/common/*:$HADOOP_HOME/share/hadoop/hdfs/*:$HADOOP_HOME/share/hadoop/hdfs/lib/*:$HADOOP_HOME/share/hadoop/hdfs/*:$HADOOP_HOME/share/hadoop/yarn/lib/*:$HADOOP_HOME/share/hadoop/yarn/*:$HADOOP_HOME/share/hadoop/mapreduce/lib/*:$HADOOP_HOME/share/hadoop/mapreduce/*:$HADOOP_HOME/share/hadoop/tools/lib/*"
 
 ENV PYSPARK_PYTHON python3
-ENV PYSPARK_DRIVER_PYTHON=python3
 
-ENV PATH $PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$SPARK_HOME/bin
-# ENV PATH $PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$SPARK_HOME/bin
+# Usar python3 para modo cluster, e jupyter + configuracao de PYSPARK_DRIVER_PYTHON_OPTS='notebook' para modo interativo
+ENV PYSPARK_DRIVER_PYTHON=python3
+#ENV PYSPARK_DRIVER_PYTHON=jupyter
+#ENV PYSPARK_DRIVER_PYTHON_OPTS='notebook'
+
+ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.7-src.zip:/usr/bin/python3
+
+ENV PATH $PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$SPARK_HOME/bin:$SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.7-src.zip:$PYTHONPATH
 
 RUN apt-get update && \
     apt-get install -y wget vim ssh openssh-server curl
 RUN apt update && apt install -y python3 python3-pip python3-dev build-essential libssl-dev libffi-dev libpq-dev
 
-# RUN apk --update --no-cache add coreutils procps vim rsync openssh-keygen openssh-client openssh-server openrc
+COPY /config/jupyter/requirements.txt /
+RUN python3 -m pip install -r requirements.txt
+RUN python3 -m pip install dask[bag] --upgrade
+RUN python3 -m pip install --upgrade toree
+RUN python3 -m bash_kernel.install
 
-RUN python3 -m pip install findspark==1.4.2
-
-RUN mkdir code && \
-cd /code && \
+RUN mkdir datasets && \
+cd /datasets && \
 wget ftp://ita.ee.lbl.gov/traces/NASA_access_log_Jul95.gz &&\
 wget ftp://ita.ee.lbl.gov/traces/NASA_access_log_Aug95.gz &&\
 gzip -d NASA_access_log_Aug95.gz &&\
@@ -57,12 +64,12 @@ RUN chmod 600 /root/.ssh/config
 
 COPY config/spark ${SPARK_HOME}/conf/
 
-COPY config/hadoop/*.xml /usr/hadoop/etc/hadoop/
-COPY config/hadoop/*.sh /usr/hadoop/etc/hadoop/
-COPY config/workers /usr/hadoop/etc/hadoop
+COPY config/hadoop/*.xml /usr/hadoop-$HADOOP_VERSION/etc/hadoop/
+COPY config/hadoop/*.sh /usr/hadoop-$HADOOP_VERSION/etc/hadoop/
+COPY config/workers /usr/hadoop-$HADOOP_VERSION/etc/hadoop
 COPY config/scripts /
 RUN echo "export JAVA_HOME=${JAVA_HOME}" >> /etc/environment
 
-EXPOSE 9000 4040 8020 22
+EXPOSE 9000 4040 8020 22 9999
 
 ENTRYPOINT ["/bin/bash", "bootstrap.sh"]
