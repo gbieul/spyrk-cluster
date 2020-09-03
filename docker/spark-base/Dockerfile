@@ -89,6 +89,6 @@ COPY config/scripts /
 # Configurando o JAVA_HOME para os processos localizarem a instalação do Java
 RUN echo "export JAVA_HOME=${JAVA_HOME}" >> /etc/environment
 
-EXPOSE 9000 4040 8020 22
+EXPOSE 9000 4040 8020 22 9083
 
 ENTRYPOINT ["/bin/bash", "bootstrap.sh"]
