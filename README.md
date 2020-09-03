@@ -338,6 +338,6 @@ Ao se finalizar, faça `docker-compose down` para parar e excluir todos os conta
 
 _On roadmap:_
 - Disponibilizar Impala
-- Disponilizar Sqoop
+- Disponilizar Kafka
 - Disponibilizar sqoop
 - Nova versão <a href="https://spark.apache.org/docs/latest/running-on-kubernetes.html">orquestrada por Kubernetes</a>
