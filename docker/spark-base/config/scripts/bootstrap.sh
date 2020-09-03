@@ -6,12 +6,14 @@ if [[ $HOSTNAME = spark-master ]]; then
     
     $HADOOP_HOME/sbin/start-dfs.sh
     $HADOOP_HOME/sbin/start-yarn.sh
+    service mysql start
     hdfs dfs -mkdir /datasets
     hdfs dfs -mkdir /datasets_processed
     hdfs dfs -put /datasets/*.txt /datasets
+
+    mysql -u root -Bse "CREATE DATABASE metastore; USE metastore; SOURCE /usr/hive/scripts/metastore/upgrade/mysql/hive-schema-2.3.0.mysql.sql; CREATE USER 'hive'@'localhost' IDENTIFIED BY 'password'; quit;"
     
     cd /user_data
-    jupyter trust Bash-Interface.ipynb
     jupyter trust Dask-Yarn.ipynb
     jupyter trust Python-Spark.ipynb
     jupyter trust Scala-Spark.ipynb

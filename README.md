@@ -2,24 +2,25 @@
 
 O objetivo deste repositório é funcionar como um mini-cluster, tendo todas as configurações básicas realizadas para as tecnologias distribuídas como Hadoop e Spark (até então). Pode-se utilizá-lo como referência para configurações, ou mesmo como uma ferramenta para análises exploratórias de algum dataset que interessar.
 
-A constituição deste repositório levou em conta alguma parte do trabalho de <a href="https://lemaizi.com/blog/creating-your-own-micro-cluster-lab-using-docker-to-experiment-with-spark-dask-on-yarn/">Amine Lemaizi</a>, porém considerando uma arquitetura com outro worker, uma estrutura própria de diretórios, uma imagem Docker inicial diferente -- aqui começamos com uma imagem do openjdk ao invés do Ubuntu---, uma propagação diferente das imagens Docker, diretório SPARK_HOME diferente, bind mount de diretórios, além de possuir algumas estruturas (como mapeamento de portas) para permitir o Spark no modo Standalone também, dentre outras questões menores como nome dos containers e algumas configurações.
+A constituição deste repositório levou em conta alguma parte do trabalho de <a href="https://lemaizi.com/blog/creating-your-own-micro-cluster-lab-using-docker-to-experiment-with-spark-dask-on-yarn/">Amine Lemaizi</a>, porém considerando uma arquitetura com outro worker, uma estrutura própria de diretórios, uma imagem Docker inicial diferente -- aqui começamos com uma imagem do openjdk ao invés do Ubuntu --, uma propagação diferente das imagens Docker, diretório SPARK_HOME diferente, bind mount de diretórios, além de possuir algumas estruturas (como mapeamento de portas) para permitir o Spark no modo Standalone também, dentre outras questões menores como nome dos containers e algumas configurações.
 
 Nas sessões abaixo há referências sobre a prória estrutura do diretório e das principais configurações.
 
 Alguns recursos deste mini-lab:
 - HDFS
 - Spark
+- Hive
 - Dask
 - Modo cluster ou interativo
 - Jupyter (para modo interativo apenas)
-- Bibliotecas Python (vide `docker/spark-base/jupyter/requirements.txt`)
+- Bibliotecas Python (vide `/docker/spark-base/jupyter/requirements.txt`)
+
+**TL;DR - Quero saber apenas <a href="https://github.com/gbieul/spark-cluster/tree/master#14-como-usar">como usar</a>**
 
 ## 1.1. - A árvore do diretório
 
     .
     ├── build-images.sh
-    ├── docker-compose.yml
-    ├── README.md
     ├── docker
     │   ├── spark-base
     │   │   ├── config
@@ -31,6 +32,8 @@ Alguns recursos deste mini-lab:
     │   │   │   │   ├── mapred-site.xml
     │   │   │   │   ├── slaves
     │   │   │   │   └── yarn-site.xml
+    │   │   │   ├── hive
+    │   │   │   │   └── hive-site.xml
     │   │   │   ├── jupyter
     │   │   │   │   └── requirements.txt
     │   │   │   ├── scripts
@@ -43,16 +46,23 @@ Alguns recursos deste mini-lab:
     │   │   └── Dockerfile
     │   └── spark-worker
     │       └── Dockerfile
+    ├── docker-compose.yml
     ├── env
     │   └── spark-worker.sh
     ├── images
-    │   └── arquitetura.png
+    │   ├── arquitetura.png
+    │   ├── Cluster_nodes_applications.png
+    │   ├── Hadoop_overview.png
+    │   └── resource_node_manager.png
+    ├── README.md
+    ├── start-spark.sh
     └── user_data
         ├── Dask-Yarn.ipynb
         ├── nasa_data.ipynb
         ├── Python-Spark.ipynb
         ├── Scala-Spark.ipynb
         └── spark-submit.py
+
 
 Na raíz do diretório estão presentes os arquivos build-images.sh, que faz o build das imagens
 docker deste repositório, o arquivo docker-compose.yml, que define a stack com o docker que é
@@ -81,25 +91,7 @@ um node master e três nodes workers, cada qual com seus respectivos serviços.
 
 ## 1.3. Configurações do cluster
 
-### 1.3.1. spark-defaults.conf
-Path: `/docker/spark-base/config/spark/spark-defaults.conf`
-
-    spark.master                     yarn
-
-    spark.driver.memory              1024m
-    spark.executor.memory            1024m
-
-    # Isso deve ser menor que o parametro yarn.nodemanager.resource.memory-mb (no arquivo yarn-site.xml)
-    spark.yarn.am.memory             1024m
-
-    # Opções: cluster ou client
-    spark.submit.deployMode          client
-
-Este arquivo contém algumas configurações padrão do Spark. Importante notar que `spark.master` está configurado como `yarn`, desabilitando, assim, o standalone mode; e que `spark.submit.deployMode` aqui está configurado como `client`, podendo assumir também o valor `cluster` se a intenção for testar jobs via `spark-submit`. Aqui, por padrão, temos o modo interativo habilitado.
-
-Além disso, notar a observação sobre a necessidade de que `spark.yarn.am.memory` tenha um valor menor do que `yarn.nodemanager.resource.memory-mb `do yarn-site.xml.
-
-### 1.3.2. slaves
+### 1.3.1. slaves
 Path: `/docker/spark-base/config/hadoop/slaves`
 
     master
@@ -109,7 +101,7 @@ Path: `/docker/spark-base/config/hadoop/slaves`
 
 Neste arquivo estão as referências aos nodes do cluster. Estes nomes conferem com os nomes do containers.
 
-### 1.3.3. core-site.xml
+### 1.3.2. core-site.xml
 Path: `/docker/spark-base/config/hadoop/core-site.xml`
 
     <?xml version="1.0"?>
@@ -123,7 +115,7 @@ Path: `/docker/spark-base/config/hadoop/core-site.xml`
 
 Neste arquivo definimos quem é o master. O valor `spark-master` se refere ao nome do container do master.
 
-### 1.3.4. hdfs-site.xml
+### 1.3.3. hdfs-site.xml
 Path: `/docker/spark-base/config/hadoop/hdfs-site.xml`
 
     <?xml version="1.0"?>
@@ -194,7 +186,7 @@ Aqui temos algumas definições de uso de recursos do yarn, bem como a definiç�
 
 O parâmetro `yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage` aqui é adicionado para se evitar erros de uso de disco ao se trabalhar com o host, mas se recomenda verificação do melhor valor ao se usar com um cluster realmente distribuído.
 
-### 1.3.4. mapred-site.xml
+### 1.3.5. mapred-site.xml
 Path: `/docker/spark-base/config/hadoop/mapred-site.xml`
 
     <?xml version="1.0"?>
@@ -244,6 +236,89 @@ Path: `/docker/spark-base/config/hadoop/mapred-site.xml`
 
 Aqui configuramos o uso de recursos por parte do MapReduce, bem como apontamos os diretórios definidos nas variáveis de ambiente como HADOOP_HOME, bem como apontamos o yarn como orquestrador.
 
+### 1.3.6. hive-site.xml
+Path: `/docker/spark-base/config/hive/hive-site.xml`
+
+    <?xml version="1.0"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    <configuration>
+            <property>
+                <name>javax.jdo.option.ConnectionURL</name>
+                <value>jdbc:mysql://spark-master/metastore?createDatabaseIfNotExist=true</value>
+                <description>the URL of the MySQL database</description>
+            </property>
+
+            <property>
+                <name>javax.jdo.option.ConnectionDriverName</name>
+                <value>org.mariadb.jdbc.Driver</value>
+            </property>
+
+            <property>
+                <name>javax.jdo.option.ConnectionUserName</name>
+                <value>hive</value>
+            </property>
+
+            <property>
+                <name>javax.jdo.option.ConnectionPassword</name>
+                <value>password</value>
+            </property>
+
+            <property>
+                <name>datanucleus.autoCreateSchema</name>
+                <value>false</value>
+            </property>
+
+            <property>
+                <name>datanucleus.fixedDatastore</name>
+                <value>true</value>
+            </property>
+
+            <property>
+                <name>datanucleus.autoStartMechanism</name> 
+                <value>SchemaTable</value>
+            </property> 
+
+            <property>
+                <name>hive.metastore.uris</name>
+                <value>thrift://spark-master:9083</value>
+                <description>IP address (or fully-qualified domain name) and port of the metastore host</description>
+            </property>
+
+            <property>
+                <name>hive.metastore.schema.verification</name>
+                <value>true</value>
+                </property>
+    </configuration>
+
+Aqui fazemos a configuração do Hive. Abaixo um resumo dos principais campos deste arquivo.
+- `javax.jdo.option.ConnectionURL` é o endereço da URL do MariaDB. Como aqui estamos operando com containers, `spark-master` substitui o IP;
+- `hive.metastore.uris` é o endereço do metastore (incluindo porta). `spark-master` mais uma vez aparece aqui;
+- `javax.jdo.option.ConnectionDriverName` define qual o driver do metastore (aqui, um MariaDB);
+- `javax.jdo.option.ConnectionUserName` define o nome de usuário que o Hive usará para acessar o metastore. Este usuário `Hive` foi criado no MariaDB também;
+- `javax.jdo.option.ConnectionPassword `idem ao usuário, foi a senha `password` definida no metastore.
+  
+Uma nota: segundo documentação da <a href="https://docs.cloudera.com/documentation/enterprise/5-6-x/topics/cdh_ig_hive_metastore_configure.html">Cloudera</a>, o único parâmetro que deve estar em master e workers é o `hive.metastore.uris`, sendo os demais apenas necessários no master. Aqui, para simplificação, se aproveitou o mesmo `hive-site.xml` para todos os nodes.
+
+### 1.3.7. spark-defaults.conf
+Path: `/docker/spark-base/config/spark/spark-defaults.conf`
+
+    spark.master                     yarn
+
+    spark.driver.memory              1024m
+    spark.executor.memory            1024m
+
+    # Isso deve ser menor que o parametro yarn.nodemanager.resource.memory-mb (no arquivo yarn-site.xml)
+    spark.yarn.am.memory             1024m
+
+    # Opções: cluster ou client
+    spark.submit.deployMode          client
+
+Este arquivo contém algumas configurações padrão do Spark. Importante notar que `spark.master` está configurado como `yarn`, desabilitando, assim, o standalone mode; e que `spark.submit.deployMode` aqui está configurado como `client`, podendo assumir também o valor `cluster` se a intenção for testar jobs via `spark-submit`. Aqui, por padrão, temos o modo interativo habilitado.
+
+Além disso, notar a observação sobre a necessidade de que `spark.yarn.am.memory` tenha um valor menor do que `yarn.nodemanager.resource.memory-mb `do yarn-site.xml.
+
+
+
 ## 1.4. Como usar
 
 Basicamente, faça um `git clone` deste repositório primeiramente. Então, faça `cd spark-cluster` seguido de `chmod +x *.sh` para permitir que os arquivos shell sejam executados.
@@ -262,6 +337,7 @@ Ao se finalizar, faça `docker-compose down` para parar e excluir todos os conta
 ## 1.5. Próximos passos
 
 _On roadmap:_
-- Disponibilizar Hive
 - Disponibilizar Impala
-- Nova versão <a href="https://spark.apache.org/docs/latest/running-on-kubernetes.html">orquestrada por Kubernetes</a> ao invés de Yarn
+- Disponilizar Kafka
+- Disponibilizar sqoop
+- Nova versão <a href="https://spark.apache.org/docs/latest/running-on-kubernetes.html">orquestrada por Kubernetes</a>
