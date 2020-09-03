@@ -9,6 +9,7 @@ Nas sessões abaixo há referências sobre a prória estrutura do diretório e d
 Alguns recursos deste mini-lab:
 - HDFS
 - Spark
+- Hive
 - Dask
 - Modo cluster ou interativo
 - Jupyter (para modo interativo apenas)
@@ -337,5 +338,6 @@ Ao se finalizar, faça `docker-compose down` para parar e excluir todos os conta
 
 _On roadmap:_
 - Disponibilizar Impala
+- Disponilizar Sqoop
 - Disponibilizar sqoop
 - Nova versão <a href="https://spark.apache.org/docs/latest/running-on-kubernetes.html">orquestrada por Kubernetes</a>
