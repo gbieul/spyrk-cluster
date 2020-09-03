@@ -2,7 +2,7 @@
 
 O objetivo deste repositório é funcionar como um mini-cluster, tendo todas as configurações básicas realizadas para as tecnologias distribuídas como Hadoop e Spark (até então). Pode-se utilizá-lo como referência para configurações, ou mesmo como uma ferramenta para análises exploratórias de algum dataset que interessar.
 
-A constituição deste repositório levou em conta alguma parte do trabalho de <a href="https://lemaizi.com/blog/creating-your-own-micro-cluster-lab-using-docker-to-experiment-with-spark-dask-on-yarn/">Amine Lemaizi</a>, porém considerando uma arquitetura com outro worker, uma estrutura própria de diretórios, uma imagem Docker inicial diferente -- aqui começamos com uma imagem do openjdk ao invés do Ubuntu---, uma propagação diferente das imagens Docker, diretório SPARK_HOME diferente, bind mount de diretórios, além de possuir algumas estruturas (como mapeamento de portas) para permitir o Spark no modo Standalone também, dentre outras questões menores como nome dos containers e algumas configurações.
+A constituição deste repositório levou em conta alguma parte do trabalho de <a href="https://lemaizi.com/blog/creating-your-own-micro-cluster-lab-using-docker-to-experiment-with-spark-dask-on-yarn/">Amine Lemaizi</a>, porém considerando uma arquitetura com outro worker, uma estrutura própria de diretórios, uma imagem Docker inicial diferente -- aqui começamos com uma imagem do openjdk ao invés do Ubuntu --, uma propagação diferente das imagens Docker, diretório SPARK_HOME diferente, bind mount de diretórios, além de possuir algumas estruturas (como mapeamento de portas) para permitir o Spark no modo Standalone também, dentre outras questões menores como nome dos containers e algumas configurações.
 
 Nas sessões abaixo há referências sobre a prória estrutura do diretório e das principais configurações.
 
@@ -12,7 +12,7 @@ Alguns recursos deste mini-lab:
 - Dask
 - Modo cluster ou interativo
 - Jupyter (para modo interativo apenas)
-- Bibliotecas Python (vide `docker/spark-base/jupyter/requirements.txt`)
+- Bibliotecas Python (vide `/docker/spark-base/jupyter/requirements.txt`)
 
 ## 1.1. - A árvore do diretório
 

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+        <property>
+            <name>javax.jdo.option.ConnectionURL</name>
+            <value>jdbc:mysql://spark-master/metastore?createDatabaseIfNotExist=true</value>
+            <description>the URL of the MySQL database</description>
+        </property>
+
+        <property>
+            <name>javax.jdo.option.ConnectionDriverName</name>
+            <value>org.mariadb.jdbc.Driver</value>
+        </property>
+
+        <property>
+            <name>javax.jdo.option.ConnectionUserName</name>
+            <value>hive</value>
+        </property>
+
+        <property>
+            <name>javax.jdo.option.ConnectionPassword</name>
+            <value>password</value>
+        </property>
+
+        <property>
+            <name>datanucleus.autoCreateSchema</name>
+            <value>false</value>
+        </property>
+
+        <property>
+            <name>datanucleus.fixedDatastore</name>
+            <value>true</value>
+        </property>
+
+        <property>
+            <name>datanucleus.autoStartMechanism</name> 
+            <value>SchemaTable</value>
+        </property> 
+
+        <property>
+            <name>hive.metastore.uris</name>
+            <value>thrift://spark-master:9083</value>
+            <description>IP address (or fully-qualified domain name) and port of the metastore host</description>
+        </property>
+
+        <property>
+            <name>hive.metastore.schema.verification</name>
+            <value>true</value>
+            </property>
+</configuration>

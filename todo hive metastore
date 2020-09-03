@@ -1,0 +1,48 @@
+
+export HIVE_VERSION=2.3.7
+
+wget http://ftp.unicamp.br/pub/apache/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz
+
+tar zxvf apache-hive-$HIVE_VERSION-bin.tar.gz
+rm apache-hive-$HIVE_VERSION-bin.tar.gz
+
+mv apache-hive-$HIVE_VERSION-bin /usr/hive
+
+export HIVE_HOME=/usr/hive
+export PATH=$PATH:$HIVE_HOME/bin
+export CLASSPATH=$CLASSPATH:/usr/hadoop-$HADOOP_VERSION/lib/*:.
+export CLASSPATH=$CLASSPATH:/usr/hive/lib/*:.
+
+cd $HIVE_HOME/conf/
+cp $HIVE_HOME/conf/hive-env.sh.template hive-env.sh
+
+# append to hive env ?
+echo "export HADOOP_HOME=/usr/hadoop-$HADOOP_VERSION/" >> hive-env.sh
+
+# https://docs.cloudera.com/documentation/enterprise/5-6-x/topics/cdh_ig_hive_metastore_configure.html
+
+apt-get install -y mariadb-server libmariadb-java
+ln -s /usr/share/java/mariadb-java-client.jar $HIVE_HOME/lib/mariadb-java-client.jar
+
+# Incluir no bootstrap
+service mysql start
+
+# MySQL
+mysql -u root -p
+CREATE DATABASE metastore; USE metastore; SOURCE /usr/hive/scripts/metastore/upgrade/mysql/hive-schema-2.3.0.mysql.sql; CREATE USER 'hive'@'localhost' IDENTIFIED BY 'password'; quit;
+
+
+
+
+
+
+REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'hive'@'localhost';
+FLUSH PRIVILEGES;
+
+GRANT ALL PRIVILEGES ON metastore.* TO 'hive'@'localhost';
+hive --service metastore &
+
+
+
+
+
