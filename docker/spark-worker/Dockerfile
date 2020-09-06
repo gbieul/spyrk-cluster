@@ -5,6 +5,8 @@ ENV SPARK_MASTER "spark://spark-master:7077"
 ENV SPARK_WORKER_LOG /spark/logs
 ENV YARN_CONF_DIR $HADOOP_CONF_DIR
 
+COPY config/hive/*.xml $HIVE_HOME/conf/
+
 EXPOSE 8081 9999 7001 8030 8031 8032
 
 ENTRYPOINT ["/bin/bash", "bootstrap.sh"]

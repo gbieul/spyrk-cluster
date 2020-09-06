@@ -11,8 +11,9 @@ if [[ $HOSTNAME = spark-master ]]; then
     hdfs dfs -mkdir /datasets_processed
     hdfs dfs -put /datasets/*.txt /datasets
 
-    mysql -u root -Bse "CREATE DATABASE metastore; USE metastore; SOURCE /usr/hive/scripts/metastore/upgrade/mysql/hive-schema-2.3.0.mysql.sql; CREATE USER 'hive'@'localhost' IDENTIFIED BY 'password'; quit;"
-    
+    mysql -u root -Bse "CREATE DATABASE metastore; USE metastore; SOURCE /usr/hive/scripts/metastore/upgrade/mysql/hive-schema-2.3.0.mysql.sql; CREATE USER 'hive'@'localhost' IDENTIFIED BY 'password'; REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'hive'@'localhost'; GRANT ALL PRIVILEGES ON metastore.* TO 'hive'@'localhost' IDENTIFIED BY 'password'; FLUSH PRIVILEGES; quit;"
+    hive --service metastore
+
     cd /user_data
     jupyter trust Dask-Yarn.ipynb
     jupyter trust Python-Spark.ipynb
