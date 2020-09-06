@@ -81,10 +81,7 @@ RUN ln -s /usr/share/java/mariadb-java-client.jar $HIVE_HOME/lib/mariadb-java-cl
 COPY config/spark ${SPARK_HOME}/conf/
 COPY config/hadoop/*.xml /usr/hadoop-$HADOOP_VERSION/etc/hadoop/
 COPY config/hadoop/*.sh /usr/hadoop-$HADOOP_VERSION/etc/hadoop/
-COPY config/hive/*.xml $HIVE_HOME/conf/
-# COPY config/workers /usr/hadoop-$HADOOP_VERSION/etc/hadoop
 COPY config/scripts /
-
 
 # Configurando o JAVA_HOME para os processos localizarem a instalação do Java
 RUN echo "export JAVA_HOME=${JAVA_HOME}" >> /etc/environment
