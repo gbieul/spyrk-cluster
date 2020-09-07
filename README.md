@@ -331,6 +331,7 @@ Uma nota: segundo documentação da <a href="https://docs.cloudera.com/documenta
 
 ### 1.3.7. hive-site.xml - *WORKERS*
 Path: `/docker/spark-worker/config/hive/hive-site.xml`
+
     <?xml version="1.0"?>
     <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
     <configuration>
@@ -384,12 +385,15 @@ Além disso, as portas 2181, 2888 e 3888 devem estar abertas em todos os nodes. 
 ## 1.4. Acessando serviços no navegador
 
 `http://10.5.0.2:8088/cluster` - Resource Manager
+
 ![Resource Manager](images/resource_manager.png?raw=true "Resource Manager")
 
 `http://10.5.0.2:8088/cluster` - Resource Manager - Visão de recursos
+
 ![Resource Manager - Recursos](images/resource_node_manager.png?raw=true "Resource Manager - Recursos")
 
 `http://10.5.0.2:50070` - NameNode WebUI
+
 ![NameNode WebUI](images/namenode_webui.png?raw=true "NameNode WebUI")
 
 
@@ -401,14 +405,14 @@ Execute `./build-images.sh`. Sua instalação docker deverá construir as imagen
 fim do processo, rode `docker-compose up` para subir a stack.
 
 No navegador, ao acessar `http://10.5.0.2:8088/cluster` você poderá ver informações do cluster, se tudo 
-estiver conforme o esperado*, ou rodar `docker exec -it spark-master /bin/bash` para ir diretamente ao 
+estiver conforme o esperado (1), ou rodar `docker exec -it spark-master /bin/bash` para ir diretamente ao 
 shell do container.
 
 O diretório `/user_data` do repositório possui um bind com `/user_data` do container. Caso queira, deixe seus arquivos nesta pasta que o container poderá também vẽ-los.
 
 Ao se finalizar, faça `docker-compose down` para parar e excluir todos os containeres.
 
-* _Observação: Caso você utilize Windows Subsystem for Linux (WSL), é possível que este acesso seja simplesmente via `http://localhost:8088/cluster`. <a href="https://stackoverflow.com/questions/63740000/accessing-docker-container-ip-when-using-wsl-ubuntu-20-04-lts">Eu fiz uma pergunta no StackOverflow sobre isso</a> e a resposta sobre o por quê isso acontece foi bem completa. Dada as possíveis dificuldades, optei por apenas expor as portas dos containers por enquanto. :)_
+* (1) _Observação: Caso você utilize Windows Subsystem for Linux (WSL), é possível que este acesso seja simplesmente via `http://localhost:8088/cluster`. <a href="https://stackoverflow.com/questions/63740000/accessing-docker-container-ip-when-using-wsl-ubuntu-20-04-lts">Eu fiz uma pergunta no StackOverflow sobre isso</a> e a resposta sobre o por quê isso acontece foi bem completa. Dada as possíveis dificuldades, optei por apenas expor as portas dos containers por enquanto. :)_
 
 
 ## 1.6. Próximos passos
