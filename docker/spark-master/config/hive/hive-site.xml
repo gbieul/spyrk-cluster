@@ -46,5 +46,30 @@
         <property>
             <name>hive.metastore.schema.verification</name>
             <value>false</value>
-            </property>
+        </property>
+
+        <property>
+            <name>hive.server2.transport.mode</name>
+            <value>binary</value>
+        </property>
+
+        <property>
+            <name>hive.server2.thrift.min.worker.threads</name>
+            <value>1</value>
+        </property>
+
+        <property>
+            <name>hive.server2.thrift.max.worker.threads</name>
+            <value>3</value>
+        </property>
+
+        <property>
+            <name>hive.server2.thrift.port</name>
+            <value>10000</value>
+        </property>
+
+        <property>
+            <name>hive.server2.thrift.bind.host</name>
+            <value>localhost</value>
+        </property>
 </configuration>
