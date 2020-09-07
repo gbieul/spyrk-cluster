@@ -59,10 +59,10 @@ Alguns recursos deste mini-lab:
     ├── env
     │   └── spark-worker.sh
     ├── images
-    │   ├── Cluster_nodes_applications.png
-    │   ├── Hadoop_overview.png
     │   ├── arquitetura.png
-    │   └── resource_node_manager.png
+    │   ├── namenode_webui.png
+    │   ├── resource_node_manager.png
+    │   └── resource_manager.png
     ├── start-spark.sh
     └── user_data
         └── spark-submit.py
