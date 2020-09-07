@@ -5,10 +5,6 @@ services:
     container_name: spark-master
     hostname: spark-master
     tty: true
-    depends_on:
-      - spark-worker-1
-      - spark-worker-2
-      - spark-worker-3
     volumes:
       - ./user_data:/user_data
     ports:
@@ -19,6 +15,7 @@ services:
       - "8042:8042"
       - "8888:8888"
       - "4040:4040"
+      - "10000:10000"
     networks: 
       spark-network:
         ipv4_address: 10.5.0.2
@@ -29,8 +26,8 @@ services:
     container_name: spark-worker-1
     hostname: spark-worker-1
     tty: true
-    #depends_on:
-    #  - spark-master
+    depends_on:
+      - spark-master
     ports:
       - "8081:8081"
       - "6042:8042"
@@ -45,8 +42,8 @@ services:
     container_name: spark-worker-2
     hostname: spark-worker-2
     tty: true
-    #depends_on:
-    #  - spark-master
+    depends_on:
+      - spark-master
     ports:
       - "8082:8081"
       - "7042:8042"
@@ -61,8 +58,8 @@ services:
     container_name: spark-worker-3
     hostname: spark-worker-3
     tty: true
-    #depends_on:
-    #  - spark-master
+    depends_on:
+      - spark-master
     ports:
       - "8083:8081"
       - "9042:8042"
