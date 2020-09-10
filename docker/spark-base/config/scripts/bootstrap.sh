@@ -15,26 +15,34 @@ if [[ $HOSTNAME = spark-master ]]; then
     # Configs de Zookeeper
     touch /var/lib/zookeeper/myid
     echo "1" >> /var/lib/zookeeper/myid
-    echo "Zookeeper: myid 1 criado"
-    ./usr/apache-zookeeper-3.6.1-bin/bin/zkServer.sh start-foreground
+    ./usr/apache-zookeeper-3.6.1-bin/bin/zkServer.sh start
+
+    # Configs de Kafka
+    sed -i 's/$/\n/' /usr/kafka/config/server.properties
+    echo "broker.id=0" >> /usr/kafka/config/server.properties
 
     # Configs de Hive
     mysql -u root -Bse "CREATE DATABASE metastore; USE metastore; SOURCE /usr/hive/scripts/metastore/upgrade/mysql/hive-schema-2.3.0.mysql.sql; CREATE USER 'hive'@'localhost' IDENTIFIED BY 'password'; REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'hive'@'localhost'; GRANT ALL PRIVILEGES ON metastore.* TO 'hive'@'localhost' IDENTIFIED BY 'password'; FLUSH PRIVILEGES; quit;"
 
     cd /user_data
-    jupyter trust Dask-Yarn.ipynb
-    jupyter trust Python-Spark.ipynb
-    jupyter trust Scala-Spark.ipynb
+    jupyter trust *.ipynb
     jupyter notebook --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password='' &
 
-    # Inicio do serviço do Hive
-    hive --service metastore
+    # Kafka
+    cd /
+    ./usr/kafka/bin/kafka-server-start.sh ./usr/kafka/config/server.properties
+
+    # Inicio do serviço do Hive. Deixar por ultimo pois ele bloqueia a execução dos demais
+    hive --service metastore &
 
 else
     # Configs de Zookeper para workers
     touch /var/lib/zookeeper/myid
     echo "$((${HOSTNAME: -1}+1))" >> /var/lib/zookeeper/myid
-    echo "Zookeeper: $HOSTNAME myid criado"
+
+    # Configs de Kafka
+    sed -i 's/$/\n/' /usr/kafka/config/server.properties
+    echo "broker.id=$((${HOSTNAME: -1}+1))" >> /usr/kafka/config/server.properties
 
     # Configs de HDFS nos Datanodes
     $HADOOP_HOME/sbin/hadoop-daemon.sh start datanode &
@@ -42,15 +50,10 @@ else
     
     # Inicio do serviço do Zookeeper
     ./usr/apache-zookeeper-3.6.1-bin/bin/zkServer.sh start
+
+    # Kafka
+    ./usr/kafka/bin/kafka-server-start.sh ./usr/kafka/config/server.properties
+
 fi
 #bash
 while :; do :; done & kill -STOP $! && wait $!
-
-
-
-
-
-
-
-
-
