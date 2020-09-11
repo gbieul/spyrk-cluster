@@ -49,27 +49,28 @@
         </property>
 
         <property>
-            <name>hive.server2.transport.mode</name>
-            <value>binary</value>
+            <name>hive.server2.enable.doAs</name>
+            <value>false</value> 
         </property>
 
         <property>
             <name>hive.server2.thrift.min.worker.threads</name>
-            <value>1</value>
+            <value>1</value> 
         </property>
 
         <property>
             <name>hive.server2.thrift.max.worker.threads</name>
-            <value>3</value>
+            <value>3</value> 
         </property>
 
         <property>
             <name>hive.server2.thrift.port</name>
-            <value>10000</value>
+            <value>10000</value> 
         </property>
 
         <property>
             <name>hive.server2.thrift.bind.host</name>
-            <value>localhost</value>
+            <value>localhost</value> 
         </property>
+
 </configuration>

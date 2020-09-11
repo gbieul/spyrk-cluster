@@ -18,7 +18,9 @@ if [[ $HOSTNAME = spark-master ]]; then
     ./usr/apache-zookeeper-3.6.1-bin/bin/zkServer.sh start
 
     # Configs de Kafka
+    # Adiciona quebra de linha
     sed -i 's/$/\n/' /usr/kafka/config/server.properties
+    # Adiciona o id do Broker
     echo "broker.id=0" >> /usr/kafka/config/server.properties
 
     # Configs de Hive
@@ -30,7 +32,7 @@ if [[ $HOSTNAME = spark-master ]]; then
 
     # Kafka
     cd /
-    ./usr/kafka/bin/kafka-server-start.sh ./usr/kafka/config/server.properties
+    ./usr/kafka/bin/kafka-server-start.sh ./usr/kafka/config/server.properties &
 
     # Inicio do serviço do Hive. Deixar por ultimo pois ele bloqueia a execução dos demais
     hive --service metastore &
@@ -49,7 +51,7 @@ else
     $HADOOP_HOME/bin/yarn nodemanager &
     
     # Inicio do serviço do Zookeeper
-    ./usr/apache-zookeeper-3.6.1-bin/bin/zkServer.sh start
+    ./usr/apache-zookeeper-3.6.1-bin/bin/zkServer.sh start &
 
     # Kafka
     ./usr/kafka/bin/kafka-server-start.sh ./usr/kafka/config/server.properties
