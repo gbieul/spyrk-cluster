@@ -9,15 +9,17 @@ services:
       - ./user_data:/user_data
     ports:
       - "8088:8088"
-      - "50070:50070" # HDFS
-      - "50030:50030"
+      - "11070:50070" # HDFS
+      - "11030:50030"
       - "8080:8080"
       - "8042:8042"
       - "8888:8888"
       - "4040:4040"
-      - "10000:10000" # HiveServer
-      - "10002:10002" # HiveServer
+      - "11000:10000" # HiveServer
+      - "11001:10001" # HiveServer
+      - "11002:10002" # HiveServer
       - "10015:10015" # HDFS
+      - "9999:9999" # Hiveserver WebUI
     networks: 
       spark-network:
         ipv4_address: 10.5.0.2

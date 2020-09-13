@@ -8,6 +8,7 @@ ENV HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 # Variaveis de ambiente do Hive
 ENV HIVE_VERSION 2.3.7
 ENV HIVE_HOME=/usr/hive
+ENV HIVE_PORT 10000
 
 # Variaveis de ambiente do Scala
 ENV SCALA_HOME=/usr/scala
@@ -21,7 +22,8 @@ ENV ZOOKEEPER_HOME /usr/apache-zookeeper-$ZOOKEEPER_VERSION-bin
 ENV KAFKA_HOME=/usr/kafka
 
 # Classpath para localizar os jars com as classes necessarias
-ENV CLASSPATH=$CLASSPATH:$HADOOP_HOME/lib:$HIVE_HOME/lib:$SCALA_HOME/lib:$KAFKA_HOME/lib
+#ENV CLASSPATH=$CLASSPATH:$HADOOP_HOME/lib:$HIVE_HOME/lib:$SCALA_HOME/lib:$KAFKA_HOME/lib
+ENV CLASSPATH=$HIVE_HOME/lib:$SCALA_HOME/lib:$KAFKA_HOME/lib
 
 # Variaveis de ambiente do Spark
 ENV SPARK_VERSION 2.4.6
@@ -86,7 +88,7 @@ RUN apt-get update \
     && ln -s /usr/share/java/mariadb-java-client.jar ${HIVE_HOME}/lib/mariadb-java-client.jar \
     # Zookeeper
     && wget \
-    https://downloads.apache.org/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz \
+    https://archive.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz\
     && tar -zvxf apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz \
     && rm apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz \
     && mv apache-zookeeper-${ZOOKEEPER_VERSION}-bin /usr/apache-zookeeper-${ZOOKEEPER_VERSION}-bin \
@@ -123,8 +125,8 @@ COPY config/zookeeper ${ZOOKEEPER_HOME}/conf/
 COPY config/kafka ${KAFKA_HOME}/config
 
 # Portas 10000:10002 relativas ao Hiveserver2
-# Portas 2181 2888 e 3888 relativas ao Zookeper, 9092 ao Kafka
-EXPOSE 9000 4040 8020 22 9083 10000 10001 10002 2181 2888 3888 9092
+# Portas 2181 2888 e 3888 relativas ao Zookeper, 9092 ao Kafka, 9999 webui do Hiveserver
+EXPOSE 9000 4040 8020 22 9083 10000 10001 10002 2181 2888 3888 9092 9999
 
 # Algumas configuracoes adicionais e inicio de alguns servicoes que devem ser feitos em
 # tempo de execucao estao presentes no script bootstrap.
