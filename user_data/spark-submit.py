@@ -14,9 +14,14 @@ from pyspark.sql.functions import *
 findspark.init('/usr/spark-2.4.6/')
 
 # Iniciando Spark com o Yarn como master
-sc = SparkContext("yarn", "nasa_data")
-sqlContext = SQLContext(sc)
-spark = SparkSession(sc)
+#sc = SparkContext("yarn", "nasa_data")
+#sqlContext = SQLContext(sc)
+spark = SparkSession\
+    .builder\
+    .appName('sparksubmit_test_app')\
+    .config("spark.sql.warehouse.dir", "hdfs:///user/hive/warehouse")\
+    .config("spark.sql.catalogImplementation","hive")\
+    .getOrCreate()  
 
 def main():
 
@@ -54,17 +59,20 @@ def main():
 
     # 1.1. Count por hosts
     host_count = logs_df.groupBy('host').agg(count('host').alias('count_host')).orderBy('count_host', ascending=False)
-    host_count.write.csv(path='/datasets_processed/hosts_count', header="true")
+    #host_count.write.csv(path='/datasets_processed/hosts_count', header="true")
+    host_count.write.mode("append").format("parquet").saveAsTable("hosts_count")
 
     # 3. Os URLs que mais causaram erro 404
     urls_404_count = logs_df.filter(logs_df.status == 404).groupBy('endpoint').agg(count('endpoint').alias('count_endpoint'))
-    urls_404_count.write.csv(path='/datasets_processed/errors_url', mode="append", header="true")
+    #urls_404_count.write.csv(path='/datasets_processed/errors_url', mode="append", header="true")
+    urls_404_count.write.mode("append").format("parquet").saveAsTable("urls_404_count")
 
     # 4. Qtde de erros 404 por dia
     byDay_404 = logs_df.filter(logs_df.status == 404).groupBy(dayofmonth('timestamp').alias('dayofmonth'),
                                                                 month('timestamp').alias('month'))\
                                                       .agg(count('endpoint').alias('count_erros')).orderBy('month', 'dayofmonth')
-    byDay_404.write.csv(path='/datasets_processed/errors_day', mode="append", header="true")
+    #byDay_404.write.csv(path='/datasets_processed/errors_day', mode="append", header="true")
+    byDay_404.write.mode("append").format("parquet").saveAsTable("byDay_404")
 
 if __name__ == "__main__":
     main()

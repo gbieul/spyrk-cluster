@@ -1,32 +1,32 @@
 version: "3.7"
 services:
   spark-master:
-    image: gbieul/spark-master-hadoop:2.4
+    image: gbieul/spark-master-hadoop:2.4.1
     container_name: spark-master
     hostname: spark-master
     tty: true
     volumes:
       - ./user_data:/user_data
     ports:
-      - "8088:8088"
-      - "11070:50070" # HDFS
+      - "8088:8088" # ResourceManager
+      - "11070:50070" # NameNode WebUI
+      - "10015:10015" # HDFS
       - "11030:50030"
       - "8080:8080"
       - "8042:8042"
-      - "8888:8888"
-      - "4040:4040"
-      - "11000:10000" # HiveServer
-      - "11001:10001" # HiveServer
-      - "11002:10002" # HiveServer
-      - "10015:10015" # HDFS
-      - "9999:9999" # Hiveserver WebUI
+      - "8888:8888" # Jupyter
+      - "4040:4040" # Spark
+      - "11000:10000" # HiveServer2 - Binary Mode
+      - "11001:10001" # HiveServer - HTTP Mode
+      - "11002:10002" # Hiveserver WebUI
+      - "9092:9092" # Kafka
     networks: 
       spark-network:
         ipv4_address: 10.5.0.2
     environment:
       - "SPARK_LOCAL_IP=spark-master"
   spark-worker-1:
-    image: gbieul/spark-worker-hadoop:2.4
+    image: gbieul/spark-worker-hadoop:2.4.1
     container_name: spark-worker-1
     hostname: spark-worker-1
     tty: true
@@ -42,7 +42,7 @@ services:
       spark-network:
         ipv4_address: 10.5.0.3
   spark-worker-2:
-    image: gbieul/spark-worker-hadoop:2.4
+    image: gbieul/spark-worker-hadoop:2.4.1
     container_name: spark-worker-2
     hostname: spark-worker-2
     tty: true
@@ -57,22 +57,6 @@ services:
     networks: 
       spark-network:
         ipv4_address: 10.5.0.4
-  spark-worker-3:
-    image: gbieul/spark-worker-hadoop:2.4
-    container_name: spark-worker-3
-    hostname: spark-worker-3
-    tty: true
-    depends_on:
-      - spark-master
-    ports:
-      - "8083:8081"
-      - "9042:8042"
-    env_file: ./env/spark-worker.sh
-    environment:
-      - "SPARK_LOCAL_IP=spark-worker-3"
-    networks: 
-      spark-network:
-        ipv4_address: 10.5.0.5
 networks:
   spark-network:
     driver: bridge

@@ -11,6 +11,7 @@ Alguns recursos deste mini-lab:
 - Spark
 - Hive
 - Zookeeper
+- Kafka
 - Dask
 - Modo cluster ou interativo
 - Jupyter (para modo interativo apenas)
@@ -38,6 +39,8 @@ Alguns recursos deste mini-lab:
     │   │       │   └── yarn-site.xml
     │   │       ├── jupyter
     │   │       │   └── requirements.txt
+    │   │       ├── kafka
+    │   │       │   └── server.properties
     │   │       ├── scripts
     │   │       │   └── bootstrap.sh
     │   │       ├── spark
@@ -56,16 +59,19 @@ Alguns recursos deste mini-lab:
     │           └── hive
     │               └── hive-site.xml
     ├── docker-compose.yml
-    ├── env
-    │   └── spark-worker.sh
     ├── images
     │   ├── arquitetura.png
     │   ├── namenode_webui.png
-    │   ├── resource_node_manager.png
-    │   └── resource_manager.png
+    │   ├── resource_manager.png
+    │   └── resource_node_manager.png
     ├── start-spark.sh
     └── user_data
-        └── spark-submit.py
+        ├── spark-submit.py
+        └── sql
+            └── streaming
+                ├── structured_kafka_wordcount.py
+                ├── structured_network_wordcount.py
+                └── structured_network_wordcount_windowed.py
 
 
 Na raíz do diretório estão presentes os arquivos build-images.sh, que faz o build das imagens
@@ -99,10 +105,8 @@ um node master e três nodes workers, cada qual com seus respectivos serviços.
 ### 1.3.1. slaves
 Path: `/docker/spark-base/config/hadoop/slaves`
 
-    master
     spark-worker-1
     spark-worker-2
-    spark-worker-3
 
 Neste arquivo estão as referências aos nodes do cluster. Estes nomes conferem com os nomes do containers.
 
@@ -136,7 +140,7 @@ Path: `/docker/spark-base/config/hadoop/hdfs-site.xml`
         </property>
         <property>
                 <name>dfs.replication</name>
-                <value>3</value>
+                <value>2</value>
         </property>
     </configuration>
 
@@ -148,6 +152,7 @@ Também se define `dfs.replication` como a quantidade de workers. Note, que caso
 Path: `/docker/spark-base/config/hadoop/yarn-site.xml`
 
     <?xml version="1.0"?>
+    <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
     <configuration>
             <property>
                     <name>yarn.acl.enable</name>
@@ -167,15 +172,15 @@ Path: `/docker/spark-base/config/hadoop/yarn-site.xml`
             </property>
             <property>
                     <name>yarn.nodemanager.resource.memory-mb</name>
-                    <value>1536</value>
+                    <value>1500</value>
             </property>
             <property>
                     <name>yarn.scheduler.minimum-allocation-mb</name>
-                    <value>128</value>
+                    <value>750</value>
             </property>
             <property>
                     <name>yarn.scheduler.maximum-allocation-mb</name>
-                    <value>1536</value>
+                    <value>1500</value>
             </property>
             <property>
                     <name>yarn.nodemanager.vmem-check-enabled</name>
@@ -197,49 +202,49 @@ Path: `/docker/spark-base/config/hadoop/mapred-site.xml`
     <?xml version="1.0"?>
     <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
     <configuration>
-    <property>
-        <name>mapreduce.framework.name</name>
-        <value>yarn</value>
-    </property>
-    <property>
-        <name>yarn.app.mapreduce.am.env</name>
-        <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
-    </property>
-    <property>
-        <name>mapreduce.map.env</name>
-        <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
-    </property>
-    <property>
-        <name>mapreduce.reduce.env</name>
-        <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
-    </property>
-    <property>
-        <name>yarn.app.mapreduce.am.resource.mb</name>
-        <value>1536</value>
-    </property>
-    <property>
-        <name>yarn.app.mapreduce.am.command-opts</name>
-        <value>400</value>
-    </property>
-    <property>
-        <name>mapreduce.map.memory.mb</name>
-        <value>128</value>
-    </property>
-    <property>
-        <name>mapreduce.reduce.memory.mb</name>
-        <value>128</value>
-    </property>
-    <property>
-        <name>mapreduce.map.java.opts</name>
-        <value>200</value>
-    </property>
-    <property>
-        <name>mapreduce.reduce.java.opts</name>
-        <value>400</value>
-    </property>
+        <property>
+            <name>mapreduce.framework.name</name>
+            <value>yarn</value>
+        </property>
+        <property>
+            <name>yarn.app.mapreduce.am.env</name>
+            <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
+        </property>
+        <property>
+            <name>mapreduce.map.env</name>
+            <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
+        </property>
+        <property>
+            <name>mapreduce.reduce.env</name>
+            <value>HADOOP_MAPRED_HOME=$HADOOP_HOME</value>
+        </property>
+        <property>
+            <name>mapreduce.map.memory.mb</name>
+            <value>750</value>
+        </property>
+        <property>
+            <name>mapreduce.reduce.memory.mb</name>
+            <value>1500</value>
+        </property>
+        <property>
+            <name>mapreduce.map.java.opts</name>
+            <value>-Xmx600m</value>
+        </property>
+        <property>
+            <name>mapreduce.reduce.java.opts</name>
+            <value>-Xmx1200m</value>
+        </property>
+        <property>
+            <name>yarn.app.mapreduce.am.resource.mb</name>
+            <value>1500</value>
+        </property>
+        <property>
+            <name>yarn.app.mapreduce.am.command-opts</name>
+            <value>-Xmx1200m</value>
+        </property>
     </configuration>
 
-Aqui configuramos o uso de recursos por parte do MapReduce, bem como apontamos os diretórios definidos nas variáveis de ambiente como HADOOP_HOME, bem como apontamos o yarn como orquestrador.
+Aqui configuramos o uso de recursos por parte do MapReduce, bem como apontamos os diretórios definidos nas variáveis de ambiente como HADOOP_HOME, bem como apontamos o yarn como orquestrador. A Cloudera tem um ótimo material sobre como usar algumas heurísticas para definir estes valores <a href="https://docs.cloudera.com/HDPDocuments/HDP2/HDP-2.6.5/bk_command-line-installation/content/determine-hdp-memory-config.html">aqui</a>. 
 
 ### 1.3.6. hive-site.xml - *MASTER*
 Path: `/docker/spark-master/config/hive/hive-site.xml`
@@ -349,18 +354,18 @@ Path: `/docker/spark-base/config/spark/spark-defaults.conf`
 
     spark.master                     yarn
 
-    spark.driver.memory              1024m
-    spark.executor.memory            1024m
+    spark.driver.memory              600m
+    spark.executor.memory            550m
 
     # Isso deve ser menor que o parametro yarn.nodemanager.resource.memory-mb (no arquivo yarn-site.xml)
-    spark.yarn.am.memory             1024m
+    spark.yarn.am.memory             300m
 
     # Opções: cluster ou client
     spark.submit.deployMode          client
 
 Este arquivo contém algumas configurações padrão do Spark. Importante notar que `spark.master` está configurado como `yarn`, desabilitando, assim, o standalone mode; e que `spark.submit.deployMode` aqui está configurado como `client`, podendo assumir também o valor `cluster` se a intenção for testar jobs via `spark-submit`. Aqui, por padrão, temos o modo interativo habilitado.
 
-Além disso, notar a observação sobre a necessidade de que `spark.yarn.am.memory` tenha um valor menor do que `yarn.nodemanager.resource.memory-mb `do yarn-site.xml.
+Além disso, notar a observação sobre a necessidade de que `spark.yarn.am.memory` tenha um valor menor do que `yarn.nodemanager.resource.memory-mb` do `yarn-site.xml`.
 
 ### 1.3.9. zoo.cfg
 Path: `/docker/spark-base/config/zookeeper/zoo.cfg`
@@ -373,7 +378,6 @@ Path: `/docker/spark-base/config/zookeeper/zoo.cfg`
     server.1=spark-master:2888:3888
     server.2=spark-worker-1:2888:3888
     server.3=spark-worker-2:2888:3888
-    server.4=spark-worker-3:2888:3888
 
 Aqui definimos parâmetros para que o Zookeeper possa se comunicar entre os nodes. Primeira coisa importante a se notar é o apontamento do dataDir para `/var/lib/zookeeper`. Este diretório que criamos contém o arquivo `myid`, um arquivo que contém unicamente o número do server o qual aquele node foi atribuído.
 
@@ -395,6 +399,10 @@ Além disso, as portas 2181, 2888 e 3888 devem estar abertas em todos os nodes. 
 `http://10.5.0.2:50070` - NameNode WebUI
 
 ![NameNode WebUI](images/namenode_webui.png?raw=true "NameNode WebUI")
+
+`http://10.5.0.2:8888` - Jupyter Notebook
+
+![Jupyter Notebook](images/jupyter.png?raw=true "Jupyter Notebook")
 
 
 ## 1.5. Como usar
@@ -418,5 +426,6 @@ Ao se finalizar, faça `docker-compose down` para parar e excluir todos os conta
 ## 1.6. Próximos passos
 
 _On roadmap:_
-- Disponilizar Kafka
-- Disponibilizar sqoop
+- _Disponilizar Kafka (DONE!)_
+- Disponibilizar Sqoop
+- Disponibilizar Flume

@@ -49,6 +49,11 @@
         </property>
 
         <property>
+            <name>hive.aux.jars.path</name>
+            <value>/usr/hive/aux_jars</value>
+        </property>
+
+        <property>
             <name>hive.server2.enable.doAs</name>
             <value>false</value> 
         </property>

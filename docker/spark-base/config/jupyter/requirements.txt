@@ -8,3 +8,8 @@ pandas==1.1.1
 findspark==1.4.2
 dask-yarn==0.8.1
 bash_kernel==0.7.2
+nltk==3.5
+johnsnowlabs==0.0.1
+spark-nlp==2.6.1
+tweepy==3.9.0
+kafka-python==2.0.1

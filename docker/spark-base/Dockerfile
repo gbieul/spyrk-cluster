@@ -54,6 +54,7 @@ RUN apt-get update \
     && python3 -m pip install dask[bag] --upgrade \
     && python3 -m pip install --upgrade toree \
     && python3 -m bash_kernel.install \
+    && python3 -c "import nltk; nltk.download('stopwords')"\
     && mkdir datasets \
     #&& cd /datasets \
     #&& wget ftp://ita.ee.lbl.gov/traces/NASA_access_log_Jul95.gz \
@@ -86,6 +87,11 @@ RUN apt-get update \
     && cp ${HIVE_HOME}/conf/hive-env.sh.template ${HIVE_HOME}/conf/hive-env.sh && echo "export HADOOP_HOME=/usr/hadoop-${HADOOP_VERSION}/" >> ${HIVE_HOME}/conf/hive-env.sh \
     # Configurando o conector do metastore do Hive
     && ln -s /usr/share/java/mariadb-java-client.jar ${HIVE_HOME}/lib/mariadb-java-client.jar \
+    # Criando diretório para jars externos do Hive e baixando suporte a parquet
+    && wget https://repo1.maven.org/maven2/com/twitter/parquet-avro/1.2.5/parquet-avro-1.2.5.jar -P /usr/hive/aux_jars/ \
+    # && hdfs dfs -mkdir /aux \
+    # && hdfs dfs -put /usr/hive/aux_jars/parquet-avro-1.2.5.jar /aux/parquet-avro-1.2.5.jar \
+    # && hive -e "add jar hdfs:////aux/parquet-avro-1.2.5.jar;" \
     # Zookeeper
     && wget \
     https://archive.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz\
