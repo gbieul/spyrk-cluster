@@ -66,13 +66,7 @@ Alguns recursos deste mini-lab:
     │   └── resource_node_manager.png
     ├── start-spark.sh
     └── user_data
-        ├── spark-submit.py
-        └── sql
-            └── streaming
-                ├── structured_kafka_wordcount.py
-                ├── structured_network_wordcount.py
-                └── structured_network_wordcount_windowed.py
-
+        └── spark-submit.py
 
 Na raíz do diretório estão presentes os arquivos build-images.sh, que faz o build das imagens
 docker deste repositório, o arquivo docker-compose.yml, que define a stack com o docker que é
@@ -97,7 +91,9 @@ arquivos locais que queiramos.
 ![Arquitetura simplificada do cluster](images/arquitetura.png?raw=true "Arquitetura Simplificada")
 
 Aqui, para questões de simplicidade (e economia de recursos), temos simulado um cluster composto de
-um node master e três nodes workers, cada qual com seus respectivos serviços.
+um node master e dois nodes workers, cada qual com seus respectivos serviços.
+
+Anteriormente se tinham três workers, mas por economia de recursos optou-se por se reduzir um worker.
 
 
 ## 1.3. Configurações do cluster
