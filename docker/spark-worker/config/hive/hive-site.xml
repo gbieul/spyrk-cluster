@@ -6,4 +6,9 @@
             <value>thrift://spark-master:9083</value>
             <description>IP address (or fully-qualified domain name) and port of the metastore host</description>
         </property>
+
+        <property>
+            <name>hive.aux.jars.path</name>
+            <value>/usr/hive/aux_jars</value>
+        </property>
 </configuration>
