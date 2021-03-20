@@ -11,7 +11,4 @@ todo hive metastore
 sql/streaming/*
 env/
 other_scripts/
-user_data/**
-Kafka-checks.txt
-run-stream-checks.txt
 .gitignore
