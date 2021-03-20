@@ -10,7 +10,6 @@ if [[ $HOSTNAME = spark-master ]]; then
     service mysql start
     hdfs dfs -mkdir /datasets
     hdfs dfs -mkdir /datasets_processed
-    hdfs dfs -put /datasets/*.txt /datasets
 
     # Configs de Zookeeper
     touch /var/lib/zookeeper/myid

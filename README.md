@@ -24,8 +24,8 @@ Alguns recursos deste mini-lab:
 
     .
     ├── README.md
-    ├── build-images.sh
     ├── docker
+    ├── Makefile
     │   ├── spark-base
     │   │   ├── Dockerfile
     │   │   └── config
