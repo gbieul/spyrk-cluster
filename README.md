@@ -64,7 +64,6 @@ Alguns recursos deste mini-lab:
     │   ├── namenode_webui.png
     │   ├── resource_manager.png
     │   └── resource_node_manager.png
-    ├── start-spark.sh
     └── user_data
         └── spark-submit.py
 

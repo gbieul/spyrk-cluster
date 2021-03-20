@@ -10,4 +10,5 @@ data/
 todo hive metastore
 env/
 other_scripts/
+sql/
 .gitignore
