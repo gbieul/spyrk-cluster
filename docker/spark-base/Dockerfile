@@ -22,7 +22,6 @@ ENV ZOOKEEPER_HOME /usr/apache-zookeeper-$ZOOKEEPER_VERSION-bin
 ENV KAFKA_HOME=/usr/kafka
 
 # Classpath para localizar os jars com as classes necessarias
-#ENV CLASSPATH=$CLASSPATH:$HADOOP_HOME/lib:$HIVE_HOME/lib:$SCALA_HOME/lib:$KAFKA_HOME/lib
 ENV CLASSPATH=$HIVE_HOME/lib:$SCALA_HOME/lib:$KAFKA_HOME/lib
 
 # Variaveis de ambiente do Spark
@@ -34,10 +33,11 @@ ENV SPARK_DIST_CLASSPATH="$HADOOP_HOME/etc/hadoop/*:$HADOOP_HOME/share/hadoop/co
 # Configuracoes do pyspark
 ENV PYSPARK_PYTHON python3
 
-# Usar python3 para modo cluster, e jupyter + configuracao de PYSPARK_DRIVER_PYTHON_OPTS='notebook' para modo interativo
+# Usar python3 para modo cluster, e jupyter + configuracao de PYSPARK_DRIVER_PYTHON_OPTS='notebook'
+# para modo interativo
 ENV PYSPARK_DRIVER_PYTHON=python3
-#ENV PYSPARK_DRIVER_PYTHON=jupyter
-#ENV PYSPARK_DRIVER_PYTHON_OPTS='notebook'
+# ENV PYSPARK_DRIVER_PYTHON=jupyter
+# ENV PYSPARK_DRIVER_PYTHON_OPTS='notebook'
 
 # Adicao de valores aos paths abaixo para que os componentes os localizem
 ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.7-src.zip:/usr/bin/python3
@@ -56,14 +56,6 @@ RUN apt-get update \
     && python3 -m bash_kernel.install \
     && python3 -c "import nltk; nltk.download('stopwords')"\
     && mkdir datasets \
-    #&& cd /datasets \
-    #&& wget ftp://ita.ee.lbl.gov/traces/NASA_access_log_Jul95.gz \
-    #&& wget ftp://ita.ee.lbl.gov/traces/NASA_access_log_Aug95.gz \
-    #&& gzip -d NASA_access_log_Aug95.gz \
-    #&& mv NASA_access_log_Aug95 NASA_access_log_Aug95.txt \
-    #&& gzip -d NASA_access_log_Jul95.gz \
-    #&& mv NASA_access_log_Jul95 NASA_access_log_Jul95.txt \
-    # && cd / \
     # Hadoop
     && curl -sL --retry 3 \
     "http://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz" \
@@ -80,7 +72,7 @@ RUN apt-get update \
     && chown -R root:root ${SPARK_HOME} \
     # Hive
     && wget \
-    http://ftp.unicamp.br/pub/apache/hive/hive-${HIVE_VERSION}/apache-hive-${HIVE_VERSION}-bin.tar.gz \
+    https://archive.apache.org/dist/hive/hive-${HIVE_VERSION}/apache-hive-${HIVE_VERSION}-bin.tar.gz \
     && tar zxvf apache-hive-${HIVE_VERSION}-bin.tar.gz \
     && rm apache-hive-${HIVE_VERSION}-bin.tar.gz \
     && mv apache-hive-${HIVE_VERSION}-bin /usr/hive \
@@ -89,9 +81,6 @@ RUN apt-get update \
     && ln -s /usr/share/java/mariadb-java-client.jar ${HIVE_HOME}/lib/mariadb-java-client.jar \
     # Criando diretório para jars externos do Hive e baixando suporte a parquet
     && wget https://repo1.maven.org/maven2/com/twitter/parquet-avro/1.2.5/parquet-avro-1.2.5.jar -P /usr/hive/aux_jars/ \
-    # && hdfs dfs -mkdir /aux \
-    # && hdfs dfs -put /usr/hive/aux_jars/parquet-avro-1.2.5.jar /aux/parquet-avro-1.2.5.jar \
-    # && hive -e "add jar hdfs:////aux/parquet-avro-1.2.5.jar;" \
     # Zookeeper
     && wget \
     https://archive.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz\
