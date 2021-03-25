@@ -11,6 +11,7 @@ ENV HIVE_HOME=/usr/hive
 ENV HIVE_PORT 10000
 
 # Variaveis de ambiente do Scala
+ENV SCALA_VERSION 2.11.0
 ENV SCALA_HOME=/usr/scala
 ENV PATH=$PATH:$SCALA_HOME/bin
 
@@ -19,6 +20,7 @@ ENV ZOOKEEPER_VERSION 3.6.1
 ENV ZOOKEEPER_HOME /usr/apache-zookeeper-$ZOOKEEPER_VERSION-bin
 
 # Variaveis de ambiente do Kafka
+ENV KAFKA_VERSION 2.11-2.3.0
 ENV KAFKA_HOME=/usr/kafka
 
 # Classpath para localizar os jars com as classes necessarias
@@ -90,16 +92,16 @@ RUN apt-get update \
     && mkdir /var/lib/zookeeper \
     # Scala
     && wget \
-    https://downloads.lightbend.com/scala/2.11.0/scala-2.11.0.tgz \
-    && tar -zvxf scala-2.11.0.tgz \
-    && rm scala-2.11.0.tgz \
-    && mv /scala-2.11.0 /usr/scala \
+    https://downloads.lightbend.com/scala/${SCALA_VERSION}/scala-${SCALA_VERSION}.tgz \
+    && tar -zvxf scala-${SCALA_VERSION}.tgz \
+    && rm scala-${SCALA_VERSION}.tgz \
+    && mv /scala-${SCALA_VERSION} /usr/scala \
     # Kafka
     && wget \
-    https://archive.apache.org/dist/kafka/2.3.0/kafka_2.11-2.3.0.tgz \
-    && tar -zvxf kafka_2.11-2.3.0.tgz \
-    && rm kafka_2.11-2.3.0.tgz \
-    && mv kafka_2.11-2.3.0 /usr/kafka \
+    https://archive.apache.org/dist/kafka/2.3.0/kafka_${KAFKA_VERSION}.tgz \
+    && tar -zvxf kafka_${KAFKA_VERSION}.tgz \
+    && rm kafka_${KAFKA_VERSION}.tgz \
+    && mv kafka_${KAFKA_VERSION} /usr/kafka \
     # Configurando o JAVA_HOME para os processos localizarem a instalação do Java
     && echo "export JAVA_HOME=${JAVA_HOME}" >> /etc/environment
 
@@ -114,7 +116,6 @@ RUN chmod 600 /root/.ssh/config
 # container estao aqui
 COPY config/spark ${SPARK_HOME}/conf/
 COPY config/hadoop/*.xml /usr/hadoop-${HADOOP_VERSION}/etc/hadoop/
-COPY config/hadoop/*.sh /usr/hadoop-${HADOOP_VERSION}/etc/hadoop/
 COPY config/scripts /
 COPY config/zookeeper ${ZOOKEEPER_HOME}/conf/
 COPY config/kafka ${KAFKA_HOME}/config
