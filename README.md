@@ -404,8 +404,7 @@ Além disso, as portas 2181, 2888 e 3888 devem estar abertas em todos os nodes. 
 
 Basicamente, faça um `git clone` deste repositório primeiramente. Então, faça `cd spark-cluster` seguido de `chmod +x *.sh` para permitir que os arquivos shell sejam executados.
 
-Execute `./build-images.sh`. Sua instalação docker deverá construir as imagens base, master e worker. Ao
-fim do processo, rode `docker-compose up` para subir a stack.
+Execute `make build` (supondo que já possua o `make` instalado). O docker deverá construir as imagens base, master e worker. Ao fim do processo, rode `docker-compose up` para subir a stack.
 
 No navegador, ao acessar `http://10.5.0.2:8088/cluster` você poderá ver informações do cluster, se tudo 
 estiver conforme o esperado (1), ou rodar `docker exec -it spark-master /bin/bash` para ir diretamente ao 

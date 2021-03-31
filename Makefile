@@ -1,3 +1,4 @@
+.PHONY: build
 
 build:
 	@docker build -t gbieul/spark-base-hadoop:2.4.1 ./docker/spark-base
