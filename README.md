@@ -24,8 +24,9 @@ Alguns recursos deste mini-lab:
 
     .
     ├── README.md
-    ├── docker
+    ├── docker-compose.yml
     ├── Makefile
+    ├── docker
     │   ├── spark-base
     │   │   ├── Dockerfile
     │   │   └── config
@@ -35,7 +36,6 @@ Alguns recursos deste mini-lab:
     │   │       │   ├── hadoop-env.sh
     │   │       │   ├── hdfs-site.xml
     │   │       │   ├── mapred-site.xml
-    │   │       │   ├── slaves
     │   │       │   └── yarn-site.xml
     │   │       ├── jupyter
     │   │       │   └── requirements.txt
@@ -51,6 +51,9 @@ Alguns recursos deste mini-lab:
     │   ├── spark-master
     │   │   ├── Dockerfile
     │   │   └── config
+    |   |       ├── hadoop
+    |   |       |   ├── masters
+    |   |       |   └── slaves
     │   │       └── hive
     │   │           └── hive-site.xml
     │   └── spark-worker
@@ -58,7 +61,8 @@ Alguns recursos deste mini-lab:
     │       └── config
     │           └── hive
     │               └── hive-site.xml
-    ├── docker-compose.yml
+    ├── env
+    |   └── spark-worker.sh
     ├── images
     │   ├── arquitetura.png
     │   ├── namenode_webui.png
