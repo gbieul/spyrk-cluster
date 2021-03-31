@@ -2,6 +2,7 @@ FROM openjdk:8-jdk-slim
 
 # Variaveis de ambiente do Hadoop
 ENV HADOOP_VERSION 2.7.3
+ENV HADOOP_MINOR_VERSION 2.7
 ENV HADOOP_HOME /usr/hadoop-$HADOOP_VERSION
 ENV HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
 
@@ -28,7 +29,6 @@ ENV CLASSPATH=$HIVE_HOME/lib:$SCALA_HOME/lib:$KAFKA_HOME/lib
 
 # Variaveis de ambiente do Spark
 ENV SPARK_VERSION 2.4.6
-ENV SPARK_PACKAGE spark-${SPARK_VERSION}-bin-hadoop2.7
 ENV SPARK_HOME /usr/spark-${SPARK_VERSION}
 ENV SPARK_DIST_CLASSPATH="$HADOOP_HOME/etc/hadoop/*:$HADOOP_HOME/share/hadoop/common/lib/*:$HADOOP_HOME/share/hadoop/common/*:$HADOOP_HOME/share/hadoop/hdfs/*:$HADOOP_HOME/share/hadoop/hdfs/lib/*:$HADOOP_HOME/share/hadoop/hdfs/*:$HADOOP_HOME/share/hadoop/yarn/lib/*:$HADOOP_HOME/share/hadoop/yarn/*:$HADOOP_HOME/share/hadoop/mapreduce/lib/*:$HADOOP_HOME/share/hadoop/mapreduce/*:$HADOOP_HOME/share/hadoop/tools/lib/*"
 
@@ -59,26 +59,27 @@ RUN apt-get update \
     && python3 -c "import nltk; nltk.download('stopwords')"\
     && mkdir datasets \
     # Hadoop
-    && curl -sL --retry 3 \
+    && wget \
     "http://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz" \
-    | gunzip \
-    | tar -x -C /usr/ \
+    && tar zvxf hadoop-${HADOOP_VERSION}.tar.gz -C /usr/ \
+    && rm hadoop-${HADOOP_VERSION}.tar.gz \
     && rm -rf ${HADOOP_HOME}/share/doc \
     && chown -R root:root ${HADOOP_HOME} \
     # Spark
-    && curl -sL --retry 3 \
-    "http://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop2.7.tgz" \
-    | gunzip \
-    | tar x -C /usr/ \
-    && mv /usr/${SPARK_PACKAGE} ${SPARK_HOME} \
+    && wget \
+    "http://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_MINOR_VERSION}.tgz" \
+    && mkdir ${SPARK_HOME} \
+    && tar zvxf spark-${SPARK_VERSION}-bin-hadoop${HADOOP_MINOR_VERSION}.tgz -C ${SPARK_HOME} \
+    && rm spark-${SPARK_VERSION}-bin-hadoop${HADOOP_MINOR_VERSION}.tgz \
     && chown -R root:root ${SPARK_HOME} \
     # Hive
     && wget \
     https://archive.apache.org/dist/hive/hive-${HIVE_VERSION}/apache-hive-${HIVE_VERSION}-bin.tar.gz \
     && tar zxvf apache-hive-${HIVE_VERSION}-bin.tar.gz \
     && rm apache-hive-${HIVE_VERSION}-bin.tar.gz \
-    && mv apache-hive-${HIVE_VERSION}-bin /usr/hive \
-    && cp ${HIVE_HOME}/conf/hive-env.sh.template ${HIVE_HOME}/conf/hive-env.sh && echo "export HADOOP_HOME=/usr/hadoop-${HADOOP_VERSION}/" >> ${HIVE_HOME}/conf/hive-env.sh \
+    && mv apache-hive-${HIVE_VERSION}-bin ${HIVE_HOME} \
+    && cp ${HIVE_HOME}/conf/hive-env.sh.template ${HIVE_HOME}/conf/hive-env.sh \
+    && echo "export HADOOP_HOME=/usr/hadoop-${HADOOP_VERSION}/" >> ${HIVE_HOME}/conf/hive-env.sh \
     # Configurando o conector do metastore do Hive
     && ln -s /usr/share/java/mariadb-java-client.jar ${HIVE_HOME}/lib/mariadb-java-client.jar \
     # Criando diretório para jars externos do Hive e baixando suporte a parquet
