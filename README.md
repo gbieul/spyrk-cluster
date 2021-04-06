@@ -61,8 +61,6 @@ Alguns recursos deste mini-lab:
     │       └── config
     │           └── hive
     │               └── hive-site.xml
-    ├── env
-    |   └── spark-worker.sh
     ├── images
     │   ├── arquitetura.png
     │   ├── namenode_webui.png

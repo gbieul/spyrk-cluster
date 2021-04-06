@@ -1,4 +1,4 @@
-FROM gbieul/spark-base-hadoop:2.4.1
+FROM gbieul/spark-base-hadoop:2.4.6
 
 ENV SPARK_MASTER_PORT 7077
 ENV SPARK_MASTER_WEBUI_PORT 8080
