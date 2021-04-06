@@ -21,7 +21,8 @@ ENV ZOOKEEPER_VERSION 3.6.1
 ENV ZOOKEEPER_HOME /usr/apache-zookeeper-$ZOOKEEPER_VERSION-bin
 
 # Variaveis de ambiente do Kafka
-ENV KAFKA_VERSION 2.11-2.3.0
+ENV SCALA_KAFKA_VERSION 2.11-2.3.0
+ENV KAFKA_VERSION 2.3.0
 ENV KAFKA_HOME=/usr/kafka
 
 # Classpath para localizar os jars com as classes necessarias
@@ -99,10 +100,10 @@ RUN apt-get update \
     && mv /scala-${SCALA_VERSION} /usr/scala \
     # Kafka
     && wget \
-    https://archive.apache.org/dist/kafka/2.3.0/kafka_${KAFKA_VERSION}.tgz \
-    && tar -zvxf kafka_${KAFKA_VERSION}.tgz \
-    && rm kafka_${KAFKA_VERSION}.tgz \
-    && mv kafka_${KAFKA_VERSION} /usr/kafka \
+    https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_${SCALA_KAFKA_VERSION}.tgz \
+    && tar -zvxf kafka_${SCALA_KAFKA_VERSION}.tgz \
+    && rm kafka_${SCALA_KAFKA_VERSION}.tgz \
+    && mv kafka_${SCALA_KAFKA_VERSION} /usr/kafka \
     # Configurando o JAVA_HOME para os processos localizarem a instalação do Java
     && echo "export JAVA_HOME=${JAVA_HOME}" >> /etc/environment
 
