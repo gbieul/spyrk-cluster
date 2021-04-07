@@ -3,12 +3,14 @@
 # Este trecho rodará independente de termos um container master ou
 # worker. Necesário para funcionamento do HDFS e para comunicação
 # dos containers/nodes.
-hdfs namenode -format
 /etc/init.d/ssh start
 
 # Abaixo temos o trecho que rodará apenas no master.
 if [[ $HOSTNAME = spark-master ]]; then
     
+    # Formatamos o namenode
+    hdfs namenode -format
+
     # Iniciamos os serviços
     $HADOOP_HOME/sbin/start-dfs.sh
     $HADOOP_HOME/sbin/start-yarn.sh

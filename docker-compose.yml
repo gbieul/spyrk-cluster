@@ -11,9 +11,8 @@ services:
       - "8088:8088" # ResourceManager
       - "11070:50070" # NameNode WebUI
       - "10015:10015" # HDFS
-      - "11030:50030"
-      - "8080:8080"
-      - "8042:8042"
+      - "8080:8080" # WebUI Spark Master
+      - "8042:8042" # NodeManager
       - "8888:8888" # Jupyter
       - "4040:4040" # Spark
       - "11000:10000" # HiveServer2 - Binary Mode
@@ -33,8 +32,8 @@ services:
     depends_on:
       - spark-master
     ports:
-      - "8081:8081"
-      - "6042:8042"
+      - "8081:8081" # WebUI Spark worker
+      - "6042:8042" # NodeManager
     environment:
       - "SPARK_LOCAL_IP=spark-worker-1"
     networks: 
@@ -48,8 +47,8 @@ services:
     depends_on:
       - spark-master
     ports:
-      - "8082:8081"
-      - "7042:8042"
+      - "8082:8081" # WebUI Spark worker
+      - "7042:8042" # NodeManager
     environment:
       - "SPARK_LOCAL_IP=spark-worker-2"
     networks: 
